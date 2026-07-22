@@ -1,0 +1,9 @@
+
+> parse-template-backend@1.0.0 start
+> node src/server.js
+
+warn: DeprecationWarning: The Parse Server option 'encodeParseObjectInCloudFunction' default will change to 'true' in a future version.
+warn: DeprecationWarning: The Parse Server option 'enableInsecureAuthAdapters' default will change to 'false' in a future version.
+warn: DeprecationWarning: insecure adapter is deprecated and will be removed in a future version.
+warn: DeprecationWarning: insecure adapter is deprecated and will be removed in a future version.
+warn: DeprecationWarning: insecure adapter is deprecated and will be removed in a future version.
