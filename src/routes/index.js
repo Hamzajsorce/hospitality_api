@@ -1,4 +1,5 @@
 const { documentRoute } = require('../swagger/documentRoute');
+const { registerSchemaRoutes } = require('./schemaRoutes');
 
 function registerRoutes(app) {
   documentRoute('get', '/api', {
@@ -26,6 +27,8 @@ function registerRoutes(app) {
   app.get('/api', (req, res) => {
     res.json({ code: 1, message: 'Hospitality API is running' });
   });
+
+  registerSchemaRoutes(app);
 }
 
 module.exports = { registerRoutes };
