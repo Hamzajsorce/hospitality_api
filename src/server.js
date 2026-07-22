@@ -62,6 +62,7 @@ registerRoutes(app);
 setupSwagger(app, {
   port: parseConfig.port,
   appId: parseConfig.appId,
+  publicServerURL: parseConfig.publicServerURL,
 });
 
 async function start() {

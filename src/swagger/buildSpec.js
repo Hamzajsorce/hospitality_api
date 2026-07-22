@@ -111,6 +111,27 @@ function buildRestPaths() {
   return paths;
 }
 
+function normalizeServerUrl(url) {
+  const cleanUrl = String(url || '').replace(/\/+$/g, '');
+  if (!cleanUrl) return '';
+  return cleanUrl.endsWith('/parse') ? cleanUrl.slice(0, -'/parse'.length) : cleanUrl;
+}
+
+function buildServers(config = {}) {
+  const { port = 1337 } = config;
+  const publicUrl = normalizeServerUrl(
+    config.publicServerURL || process.env.RENDER_EXTERNAL_URL || process.env.PARSE_PUBLIC_SERVER_URL
+  );
+  const servers = [{ url: '/', description: 'Current server' }];
+
+  if (publicUrl && publicUrl !== '/') {
+    servers.push({ url: publicUrl, description: 'Configured public server' });
+  }
+
+  servers.push({ url: `http://localhost:${port}`, description: 'Local development' });
+  return servers;
+}
+
 function buildSpec(config = {}) {
   const { port = 1337, appId = 'hospitality-app' } = config;
 
@@ -128,10 +149,7 @@ function buildSpec(config = {}) {
         `Default Parse App ID: \`${appId}\``,
       ].join('\n'),
     },
-    servers: [
-      { url: 'https://srv-d9g8dpsm0tmc73bgo1kg', description: 'Deployed server' },
-      { url: `http://localhost:${port}`, description: 'Local development' },
-    ],
+    servers: buildServers({ ...config, port }),
     tags: [
       { name: 'System', description: 'Health and status endpoints' },
       { name: 'Hospitality', description: 'Hospitality cloud functions' },
