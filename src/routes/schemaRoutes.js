@@ -31,6 +31,15 @@ function registerSchemaRoutes(app) {
     summary: 'Create missing Parse classes and columns',
     description:
       'Requires `X-Schema-Sync-Key` or `X-Parse-Master-Key`. Pass `{ "dryRun": true }` to only check.',
+    parameters: [
+      {
+        name: 'X-Schema-Sync-Key',
+        in: 'header',
+        required: true,
+        schema: { type: 'string' },
+        description: 'Set this to SCHEMA_SYNC_KEY. If SCHEMA_SYNC_KEY is not configured, use PARSE_MASTER_KEY.',
+      },
+    ],
     requestBody: {
       required: false,
       content: {
