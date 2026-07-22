@@ -128,7 +128,10 @@ function buildSpec(config = {}) {
         `Default Parse App ID: \`${appId}\``,
       ].join('\n'),
     },
-    servers: [{ url: `http://localhost:${port}`, description: 'Local development' }],
+    servers: [
+      { url: 'https://srv-d9g8dpsm0tmc73bgo1kg', description: 'Deployed server' },
+      { url: `http://localhost:${port}`, description: 'Local development' },
+    ],
     tags: [
       { name: 'System', description: 'Health and status endpoints' },
       { name: 'Hospitality', description: 'Hospitality cloud functions' },
