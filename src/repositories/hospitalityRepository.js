@@ -61,6 +61,31 @@ function serializeRequest(request) {
   return data;
 }
 
+function parseDateFilter(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function parseDateOnlyEnd(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const date = new Date(`${value}T23:59:59.999Z`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function resolveDateRange(filters = {}) {
+  const fromDate = filters.fromDate ? parseDateFilter(filters.fromDate) : null;
+  let toDate = filters.toDate ? parseDateOnlyEnd(filters.toDate) || parseDateFilter(filters.toDate) : null;
+
+  if (fromDate && toDate && fromDate.getTime() === toDate.getTime()) {
+    toDate = new Date(toDate.getTime() + 24 * 60 * 60 * 1000 - 1);
+  }
+
+  return { fromDate, toDate };
+}
+
 function applyRequestFilters(query, filters = {}) {
   if (filters.status) query.equalTo('status', filters.status);
   if (filters.statuses?.length) query.containedIn('status', filters.statuses);
@@ -70,13 +95,13 @@ function applyRequestFilters(query, filters = {}) {
   if (filters.hospitalityTypeId) query.equalTo('hospitalityTypeId', filters.hospitalityTypeId);
   if (filters.itemOptionId) query.contains('itemOptionIds', filters.itemOptionId);
 
-  if (filters.fromDate) {
-    query.greaterThanOrEqualTo('requestDate', new Date(filters.fromDate));
+  const { fromDate, toDate } = resolveDateRange(filters);
+
+  if (fromDate) {
+    query.greaterThanOrEqualTo('requestDate', fromDate);
   }
 
-  if (filters.toDate) {
-    const toDate = new Date(filters.toDate);
-    toDate.setHours(23, 59, 59, 999);
+  if (toDate) {
     query.lessThanOrEqualTo('requestDate', toDate);
   }
 }
