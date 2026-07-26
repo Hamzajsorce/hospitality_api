@@ -1,0 +1,17 @@
+PORT=1337
+DB_USER="jsource2022_db_user"
+DB_PASSWORD="sPks9jDvN7gXnF60"
+DATABASE_URI="mongodb+srv://<db_username>:f9St1L8Yxz7gUnqB@hospitality1.wzibbsg.mongodb.net/?appName=hospitality1"
+PARSE_APP_ID="hospitality-app"
+PARSE_MASTER_KEY="hamza_hospitality_96"
+PARSE_JAVASCRIPT_KEY="hamza_hospitality_96"
+PARSE_SERVER_URL="http://localhost:1337/parse"
+PARSE_PUBLIC_SERVER_URL="http://localhost:1337/parse"
+ALLOW_CLIENT_CLASS_CREATION="true"
+DASHBOARD_USER="admin"
+DASHBOARD_PASS="admin123"
+DASHBOARD_APP_NAME="Hospitality Requests"
+TELEGRAMOTTOKEN="8902153282:AAEWJbhOHlcDEuFfouZCRmiWMUevABWK6qs"
+TELEGRAMCHATID="-1004377253127"
+
+

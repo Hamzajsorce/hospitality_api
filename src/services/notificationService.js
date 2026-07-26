@@ -1,5 +1,6 @@
 const notificationRepository = require('../repositories/notificationRepository');
 const userRepository = require('../repositories/userRepository');
+const settingsService = require('./settingsService');
 const { AppError } = require('../utils/AppError');
 const TelegramNotifier = require('../utils/telegramNotifier');
 
@@ -15,8 +16,27 @@ function ensureOwnNotification(notification, user) {
   }
 }
 
-function buildTelegramNotificationMessage(notification) {
-  return telegramNotifier.buildMessage(notification.title, notification.text);
+async function sendTelegramToRole(role, title, text) {
+  if (!role) {
+    console.warn('NotificationService skipped Telegram notification: missing role.');
+    return;
+  }
+
+  const groups = await settingsService.getActiveTelegramGroupsForRole(role);
+  if (!groups.length) {
+    console.warn('NotificationService skipped Telegram notification: no groups configured.', { role });
+    return;
+  }
+
+  const message = telegramNotifier.buildMessage(title, text);
+  for (const group of groups) {
+    console.info('NotificationService sending Telegram notification to role group.', {
+      role,
+      groupId: group.objectId,
+      chatId: group.chatId,
+    });
+    await new TelegramNotifier(telegramToken, group.chatId).send(message);
+  }
 }
 
 async function listForUser(params = {}, user) {
@@ -66,13 +86,15 @@ async function createForUser(payload) {
   });
 
   if (!payload.skipTelegram) {
+    const targetUser = await userRepository.findUserById(payload.targetUserId);
     console.info('NotificationService sending Telegram notification for user notification.', {
       notificationId: notification.objectId,
       targetUserId: payload.targetUserId,
+      targetRole: targetUser?.role,
       moduleType: notification.moduleType,
       moduleId: notification.moduleId,
     });
-    await telegramNotifier.send(buildTelegramNotificationMessage(notification));
+    await sendTelegramToRole(targetUser?.role, notification.title, notification.text);
   }
 
   return notification;
@@ -98,7 +120,7 @@ async function createForUsers(userIds = [], payload) {
       moduleType: payload.moduleType,
       moduleId: payload.moduleId,
     });
-    await telegramNotifier.send(telegramNotifier.buildMessage(payload.title, payload.text));
+    await sendTelegramToRole(payload.telegramRole, payload.title, payload.text);
   } else {
     console.warn('NotificationService skipped Telegram group notification.', {
       recipients: uniqueIds.length,
@@ -114,7 +136,10 @@ async function createForRole(role, payload) {
   const users = await userRepository.findUsersByRole(role);
   return createForUsers(
     users.map((user) => user.objectId),
-    payload
+    {
+      ...payload,
+      telegramRole: role,
+    }
   );
 }
 
